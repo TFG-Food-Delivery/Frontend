@@ -1,2 +1,4 @@
 export * from "./LoginForm";
-export * from "./RegisterForm";
+export * from "./RegisterCustomerForm";
+export * from "./RegisterRestaurantForm";
+export * from "./RegisterCourierForm";

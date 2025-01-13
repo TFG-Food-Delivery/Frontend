@@ -1,11 +1,10 @@
-import { Box } from "@mui/material";
-import { AuthLayout } from "../components/AuthLayout";
-import { AuthPage } from "../enum/auth-page.enum";
+import { Container } from "@mui/material";
+import { LoginForm } from "../components/forms";
 
 export const LoginPage = () => {
     return (
-        <Box>
-            <AuthLayout authPage={AuthPage.LOGIN} />
-        </Box>
+        <Container maxWidth="sm">
+            <LoginForm />
+        </Container>
     );
 };

@@ -1,13 +1,42 @@
+import { useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Alert, Box, Button, Divider, Stack, TextField, Typography } from "@mui/material";
 import { Google } from "@mui/icons-material";
-import { Box, Button, Divider, Stack, TextField, Typography } from "@mui/material";
-import { FormEvent, useState } from "react";
+import { authStatus, startGoogleSignIn, startLoginNativeUser } from "../../../store/auth";
+import { useForm } from "react-hook-form";
+import { LoginFormData, loginSchema } from "./validation";
+import { joiResolver } from "@hookform/resolvers/joi";
+import { AppDispatch } from "../../../store";
+import { useNavigate } from "react-router";
 
 export const LoginForm = () => {
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
+    const { status, errorMessage } = useSelector((state: any) => state.auth);
+    const navigate = useNavigate();
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>): void {
-        throw new Error("Function not implemented.");
+    const dispatch = useDispatch<AppDispatch>();
+
+    const isAuthenticating = useMemo(() => status === authStatus.checking, [status]);
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<LoginFormData>({
+        resolver: joiResolver(loginSchema),
+    });
+
+    const onSubmit = async (data: LoginFormData) => {
+        if (errors === null) {
+            console.log("errors:", errors);
+            return;
+        }
+        const ok = await dispatch(startLoginNativeUser(data));
+        if (ok) navigate("/");
+        else return;
+    };
+
+    function handleGoogleSignIn() {
+        dispatch(startGoogleSignIn(navigate));
     }
 
     return (
@@ -26,39 +55,55 @@ export const LoginForm = () => {
                 Let's Go!
             </Typography>
 
-            <form onSubmit={handleSubmit} className="register-form">
-                <Stack spacing={4} sx={{ alignItems: "center", maxWidth: "50%", margin: "7rem auto 3rem" }}>
-                    <TextField id="email" label="Email" variant="outlined" value={email} fullWidth required />
+            <form onSubmit={handleSubmit(onSubmit)} className="register-form">
+                <Stack spacing={4} sx={{ alignItems: "center", margin: "7rem auto 3rem" }}>
                     <TextField
-                        id="password"
-                        label="Password"
+                        error={!!errors.password || !!errors.email}
+                        label="Email"
                         variant="outlined"
-                        value={password}
-                        type="password"
                         fullWidth
                         required
+                        {...register("email")}
                     />
+                    <TextField
+                        error={!!errors.password || !!errors.email}
+                        type="password"
+                        label="Password"
+                        variant="outlined"
+                        fullWidth
+                        required
+                        {...register("password")}
+                    />
+                    {(errors.email || errors.password) && (
+                        <Typography color="error">Invalid email/password.</Typography>
+                    )}
+                    {!(errors.email || errors.password) && errorMessage && (
+                        <Alert severity="error">{errorMessage.message}</Alert>
+                    )}
                     <Button
                         type="submit"
+                        disabled={isAuthenticating}
                         variant="contained"
                         color="primary"
                         size="large"
-                        sx={{ marginBottom: "4rem", width: "30%" }}
+                        sx={{ marginBottom: "4rem" }}
                     >
-                        Register
+                        Log In
                     </Button>
                 </Stack>
             </form>
             <Divider variant="middle" sx={{ width: "30%", margin: "auto" }}>
                 Or
             </Divider>
-            <div style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <Button
                     variant="contained"
+                    disabled={isAuthenticating}
                     color="secondary"
                     size="large"
-                    sx={{ margin: "2rem auto 4rem", width: "30%" }}
+                    sx={{ margin: "2rem auto 4rem" }}
                     startIcon={<Google />}
+                    onClick={handleGoogleSignIn}
                 >
                     Sign In with Google
                 </Button>

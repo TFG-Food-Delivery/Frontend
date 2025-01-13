@@ -1,9 +1,11 @@
-import { Typography } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 
 export const HomePage = () => {
     return (
         <div>
-            <Typography variant="h1">Whatever Meal To Your Door</Typography>
+            <Container maxWidth="xl">
+                <Typography variant="h1">Meals Delivered To Your Door</Typography>
+            </Container>
         </div>
     );
 };
