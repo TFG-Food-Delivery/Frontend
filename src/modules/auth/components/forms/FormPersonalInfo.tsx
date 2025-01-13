@@ -47,10 +47,10 @@ export const FormPersonalInfo = ({
     panel,
     getValues,
 }: Props) => {
-    let name, lastName, email, photoURL;
+    let name, lastName, email;
     const [errorUserExists, setErrorUserExists] = useState<string | null>(null);
     if (isGoogleUser && googleUser) {
-        ({ name, lastName, email, photoURL } = googleUser);
+        ({ name, lastName, email } = googleUser);
     }
 
     const handleNextStep = async (event: any) => {

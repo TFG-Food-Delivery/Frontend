@@ -5,9 +5,10 @@ import { Delete, Edit } from "@mui/icons-material";
 type Props = {
     dish: Dish;
     openDialog: ({ dish, categoryId }: { dish?: Dish; categoryId?: string }) => void;
+    openDeleteDialog: ({ dish }: { dish?: Dish }) => void;
 };
 
-export const DishCard = ({ dish, openDialog }: Props) => {
+export const DishCard = ({ dish, openDialog, openDeleteDialog }: Props) => {
     return (
         <Card
             sx={{
@@ -45,7 +46,7 @@ export const DishCard = ({ dish, openDialog }: Props) => {
                 <IconButton size="small" onClick={() => openDialog({ dish })} sx={{ mr: 1 }}>
                     <Edit />
                 </IconButton>
-                <IconButton size="small" color="error">
+                <IconButton size="small" color="error" onClick={() => openDeleteDialog({ dish })}>
                     <Delete />
                 </IconButton>
             </Box>

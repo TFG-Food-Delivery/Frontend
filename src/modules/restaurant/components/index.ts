@@ -4,3 +4,4 @@ export * from "./OrderListItem";
 export * from "./SearchOrdersBar";
 export * from "./CategoryDialog";
 export * from "./DishCard";
+export * from "./DeleteDishDialog";

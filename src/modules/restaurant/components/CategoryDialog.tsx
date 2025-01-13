@@ -15,7 +15,15 @@ export const CategoryDialog = ({ open, onClose, setData }: CategoryDialogProps) 
     const [categoryName, setCategoryName] = useState("");
     const onSubmit = async (data: any) => {
         const newCategory = await useCreateCategory(uid, categoryName);
-        setData((prevData: any) => [...prevData, newCategory]);
+        setData((prevData: any) => [
+            ...prevData,
+            {
+                categoryId: newCategory.id,
+                categoryName: newCategory.name,
+                dishes: [],
+            },
+        ]);
+        setCategoryName("");
         onClose();
     };
 

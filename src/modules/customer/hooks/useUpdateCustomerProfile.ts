@@ -19,7 +19,6 @@ export const useUpdateCustomerProfile = (customerId: string, updatedData: any) =
 
     const submitForm = async () => {
         try {
-            console.log(payload);
             await customerAPI.patch(`/${customerId}`, payload);
 
             return null;

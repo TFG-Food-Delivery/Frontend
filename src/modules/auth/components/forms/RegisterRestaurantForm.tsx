@@ -11,6 +11,7 @@ import { useRegisterFormData } from "../../hooks";
 import { FormPersonalInfo } from "./FormPersonalInfo";
 import { FormAddressInfo } from "./FormAddressInfo";
 import { FormRestaurantInfo } from "./FormRestaurantInfo";
+import { restaurantAPI } from "../../../api";
 
 export const RegisterRestaurantForm = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -19,7 +20,7 @@ export const RegisterRestaurantForm = () => {
     const [expanded, setExpanded] = useState<string | false>("panel1");
     const [selectedCuisine, setSelectedCuisine] = useState<CuisineType | null>(null);
     const [selectedCuisineError, setSelectedCuisineError] = useState<string | null>(null);
-
+    const [selectedRestaurantImage, setSelectedRestaurantImage] = useState<File | undefined>(undefined);
     const {
         register,
         control,
@@ -37,16 +38,19 @@ export const RegisterRestaurantForm = () => {
     };
 
     const onSubmit = async (data: any) => {
-        if (!selectedCuisine) {
-            setSelectedCuisineError("Cuisine type is required");
-            return;
-        }
         const formData = await useRegisterFormData({
             data: { ...data, cuisineType: selectedCuisine },
             role: RolesList.RESTAURANT,
         });
-        const error = await dispatch(startCreatingNativeRestaurantUser(formData));
-        if (!error) navigate("/menu");
+        const result = await dispatch(startCreatingNativeRestaurantUser(formData));
+        if (result && selectedRestaurantImage) {
+            const imageFormData = new FormData();
+            imageFormData.append("file", selectedRestaurantImage);
+
+            await restaurantAPI.post(`/${result.id}/upload-image`, imageFormData);
+        }
+
+        navigate("/menu");
     };
 
     return (
@@ -58,7 +62,10 @@ export const RegisterRestaurantForm = () => {
                 Be Part Of Us!
             </Typography>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="register-form">
+            <form
+                onSubmit={handleSubmit(onSubmit, (errors) => console.log("Errores de validación:", errors))}
+                className="register-form"
+            >
                 <FormPersonalInfo
                     register={register}
                     control={control}
@@ -79,6 +86,8 @@ export const RegisterRestaurantForm = () => {
                     setSelectedCuisine={setSelectedCuisine}
                     selectedCuisineError={selectedCuisineError}
                     setSelectedCuisineError={setSelectedCuisineError}
+                    selectedRestaurantImage={selectedRestaurantImage}
+                    setSelectedRestaurantImage={setSelectedRestaurantImage}
                     trigger={trigger}
                     panel="2"
                 />

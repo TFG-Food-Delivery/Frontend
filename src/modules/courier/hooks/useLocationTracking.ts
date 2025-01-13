@@ -44,8 +44,6 @@ export const useLocationTracking = () => {
                     }
                     const customerCoords = await useGetCoords(customerData?.address, googleKey);
                     coords = customerCoords;
-                    console.log("coords:", coords);
-                    console.log("customerData:", customerData);
                 }
 
                 if (courierCoords && coords) {

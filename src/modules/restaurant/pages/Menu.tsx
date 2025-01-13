@@ -4,13 +4,14 @@ import { AddCircleOutlineOutlined, Add as AddIcon } from "@mui/icons-material";
 import { DishDialog } from "../components/DishDialog";
 import { useRestaurantDishes } from "../../customer/hooks";
 import { useSelector } from "react-redux";
-import { CategoryDialog, DishCard } from "../components";
+import { CategoryDialog, DeleteDishDialog, DishCard } from "../components";
 import { Dish } from "../../customer/types";
 
 export const MenuPage = () => {
     const { uid } = useSelector((state: any) => state.auth);
     const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
     const [isNewDish, setIsNewDish] = useState(false);
@@ -31,9 +32,19 @@ export const MenuPage = () => {
         setIsDialogOpen(true);
     };
 
+    const handleOpenDeleteDialog = ({ dish }: { dish?: Dish }) => {
+        if (dish) {
+            setSelectedDish(dish);
+            setSelectedCategory(dish.categoryId);
+            console.log("dishSet:", dish);
+        }
+        setIsDeleteDialogOpen(true);
+    };
+
     const handleCloseDialog = () => {
         setIsDialogOpen(false);
         setIsCategoryDialogOpen(false);
+        setIsDeleteDialogOpen(false);
         setSelectedDish(null);
     };
 
@@ -52,15 +63,26 @@ export const MenuPage = () => {
                 restaurantData.map((category) => (
                     <Box
                         key={category.categoryName}
-                        sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: 4,
+                            mb: "100px",
+                        }}
                     >
                         <Typography variant="h5" component="h1" fontWeight="bold">
                             {category.categoryName}
                         </Typography>
-                        <Grid container spacing={3} sx={{ width: "100%" }}>
+                        <Grid container spacing={3} sx={{ width: "100%", justifyContent: "center" }}>
                             {category.dishes.map((dish: Dish) => (
                                 <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={dish.name}>
-                                    <DishCard dish={dish} openDialog={handleOpenDialog} />
+                                    <DishCard
+                                        dish={dish}
+                                        openDialog={handleOpenDialog}
+                                        openDeleteDialog={handleOpenDeleteDialog}
+                                    />
                                 </Grid>
                             ))}
                             <Grid
@@ -97,10 +119,18 @@ export const MenuPage = () => {
                 open={isDialogOpen}
                 onClose={handleCloseDialog}
                 isNew={isNewDish}
+                dish={selectedDish}
                 categoryId={selectedCategory}
                 setData={setData}
             />
             <CategoryDialog open={isCategoryDialogOpen} onClose={handleCloseDialog} setData={setData} />
+            <DeleteDishDialog
+                open={isDeleteDialogOpen}
+                onClose={handleCloseDialog}
+                dish={selectedDish}
+                categoryId={selectedCategory}
+                setData={setData}
+            />
         </Container>
     );
 };

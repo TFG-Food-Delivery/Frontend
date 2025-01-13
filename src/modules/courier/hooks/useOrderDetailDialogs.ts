@@ -26,7 +26,6 @@ export const useOrderDialogs = (order: Order, courierId: string, navigate: Navig
         if (order) {
             await usePickUpOrder(order.id);
             const customerDataReceived = await useGetCustomer(order.customerId);
-            console.log("customerDataReceived:", customerDataReceived);
 
             setCustomerData(customerDataReceived);
         }

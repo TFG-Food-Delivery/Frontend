@@ -58,7 +58,6 @@ export const authSlice = createSlice({
         },
 
         updateProfilePhoto: (state, { payload }) => {
-            console.log(payload);
             state.photoURL = payload.photoURL;
         },
         checkingCredentials: (state) => {

@@ -10,11 +10,12 @@ import {
     Paper,
     Typography,
 } from "@mui/material";
-import { Control, Controller, FieldErrors, UseFormRegister, UseFormTrigger } from "react-hook-form";
+import { Control, Controller, FieldErrors, UseFormRegister, UseFormSetValue, UseFormTrigger } from "react-hook-form";
 import { CuisineType } from "../../../common/types";
 import { TimeField } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import "dayjs/locale/en-gb";
+import { useState } from "react";
 
 type Props = {
     register: UseFormRegister<any>;
@@ -28,6 +29,8 @@ type Props = {
     setSelectedCuisineError: (error: string | null) => void;
     trigger: UseFormTrigger<any>;
     panel: string;
+    selectedRestaurantImage: File | undefined;
+    setSelectedRestaurantImage: (image: File | undefined) => void;
 };
 
 export const FormRestaurantInfo = ({
@@ -42,16 +45,31 @@ export const FormRestaurantInfo = ({
     setSelectedCuisineError,
     trigger,
     panel,
+    selectedRestaurantImage,
+    setSelectedRestaurantImage,
 }: Props) => {
+    const [selectedRestaurantImageError, setSelectedRestaurantImageError] = useState<string | null>(null);
     const handleClickCuisineType = (event: React.MouseEvent<HTMLDivElement>) => {
         setSelectedCuisine(event.currentTarget.innerText as CuisineType);
         setSelectedCuisineError(null);
+    };
+
+    const handleChangeRestaurantImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            setSelectedRestaurantImage(file);
+            setSelectedRestaurantImageError(null);
+        }
     };
 
     const handleNextStep = async (event: any) => {
         const isValid = await trigger(["restaurantName", "openHour", "closeHour"]);
         if (!selectedCuisine) {
             setSelectedCuisineError("Cuisine type is required");
+            return;
+        }
+        if (!selectedRestaurantImage) {
+            setSelectedRestaurantImageError("Restaurant Image is required");
             return;
         }
         if (!isValid) {
@@ -98,6 +116,19 @@ export const FormRestaurantInfo = ({
                         {errors.restaurantName && <Typography color="error">Restaurant Name is required</Typography>}
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
+                        <Typography variant="h6">Restaurant Image:</Typography>
+                        <OutlinedInput
+                            error={!!selectedRestaurantImageError}
+                            placeholder="Restaurant Image"
+                            fullWidth
+                            type="file"
+                            onChange={handleChangeRestaurantImage}
+                        />
+                        {selectedRestaurantImageError && (
+                            <Typography color="error">{selectedRestaurantImageError}</Typography>
+                        )}
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 3 }}>
                         <Typography variant="h6">Opening Hour:</Typography>
                         <Controller
                             name="openHour"
@@ -115,7 +146,7 @@ export const FormRestaurantInfo = ({
                                             }
                                         }}
                                         format="HH:mm"
-                                        sx={{ width: { xs: "100%", sm: "50%" } }}
+                                        sx={{ width: "100%" }}
                                     />
                                     {fieldState.error && (
                                         <Typography color="error">{fieldState.error.message}</Typography>
@@ -124,7 +155,7 @@ export const FormRestaurantInfo = ({
                             )}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
+                    <Grid size={{ xs: 12, sm: 3 }}>
                         <Typography variant="h6">Closing Hour:</Typography>
 
                         <Controller
@@ -143,7 +174,7 @@ export const FormRestaurantInfo = ({
                                             }
                                         }}
                                         format="HH:mm"
-                                        sx={{ width: { xs: "100%", sm: "50%" } }}
+                                        sx={{ width: "100%" }}
                                     />
                                     {fieldState.error && (
                                         <Typography color="error">{fieldState.error.message}</Typography>

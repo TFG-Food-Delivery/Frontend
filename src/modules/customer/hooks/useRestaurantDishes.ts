@@ -15,7 +15,7 @@ export const useRestaurantDishes = ({ id }: Props) => {
             try {
                 setLoading(true);
                 const response = await restaurantAPI.get(`/${id}/menu`);
-                console.log("response:", response.data.data);
+
                 setData(response.data.data);
             } catch (err: any) {
                 setError(err);

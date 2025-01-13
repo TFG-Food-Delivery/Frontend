@@ -48,5 +48,6 @@ export const useRegisterFormData = async ({ data, role }: { data: any; role: Rol
     } else {
         formData = {};
     }
+
     return formData;
 };

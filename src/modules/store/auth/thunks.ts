@@ -117,11 +117,11 @@ export const startCreatingNativeRestaurantUser = (registerRestaurantProps: Regis
 
         if (!ok) {
             dispatch(logout({ errorMessage: resp }));
-            return resp;
+            return null;
         }
         const { id: uid, email, name: displayName, image: photoURL, role: role } = resp;
         dispatch(login({ uid, email, displayName, photoURL, role }));
-        return null;
+        return resp;
     };
 };
 
@@ -179,7 +179,7 @@ export const checkAuth = () => {
 
         if (ok && resp.user) {
             const { id: uid, email, name: displayName, image: photoURL, role: role } = resp.user;
-            console.log("User verified:", resp.user);
+
             dispatch(login({ uid, email, displayName, photoURL, role }));
         } else {
             dispatch(logout(null));

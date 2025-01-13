@@ -5,7 +5,7 @@ export const useExistsUser = async (email: string, phone: string) => {
         const response = await authAPI.get(
             `/exists?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`
         );
-        console.log(response.data);
+
         return response.data;
     } catch (error) {
         console.error("Error fetching completed orders:", error);

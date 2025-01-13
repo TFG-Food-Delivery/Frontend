@@ -28,7 +28,6 @@ export const CompletedOrdersPage = (props: Props) => {
     useEffect(() => {
         const getCompletedOrders = async () => {
             const completedOrders = await useGetCompletedOrders(restaurantId, currentPage, searchTerm);
-            console.log("completedOrders:", completedOrders.data);
 
             setCompletedOrders(completedOrders.data);
             setMaxPages(completedOrders.meta.lastPage);

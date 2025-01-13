@@ -28,40 +28,31 @@ export const DishDialog = ({ open, onClose, dish, isNew, categoryId, setData }: 
     const { uid: restaurantId } = useSelector((state: any) => state.auth);
     const [photoFile, setPhotoFile] = useState<File | null>(null);
     const [savingChanges, setSavingChanges] = useState(false);
-
+    const initialValues = {
+        name: "",
+        description: "",
+        price: null,
+        image: null as File | null,
+        categoryId,
+    };
     const { control, handleSubmit, reset, setValue, getValues } = useForm<Dish>({
-        defaultValues: {
-            name: "",
-            description: "",
-            price: 0,
-            image: null as File | null,
-            categoryId,
-        },
+        defaultValues: initialValues,
     });
 
     useEffect(() => {
         if (dish) {
             reset(dish);
         } else {
-            reset({
-                name: "",
-                description: "",
-                price: 0,
-                image: "",
-                categoryId,
-            });
+            reset(initialValues);
         }
     }, [dish, reset]);
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-        console.log("entra: " + event.target.files);
         if (event.target.files && event.target.files[0]) {
             const file = event.target.files[0];
-            console.log(`Image ${file.name} selected`);
             setPhotoFile(file);
 
             setValue("image", file, { shouldDirty: true });
-            console.log("image:", getValues("image"));
         }
     };
 
@@ -70,38 +61,61 @@ export const DishDialog = ({ open, onClose, dish, isNew, categoryId, setData }: 
         formData.append("file", file);
         // Endpoint del backend para subir la imagen a S3
         const response = await restaurantAPI
-            .post(`/${restaurantId}/upload-image`, formData)
+            .post(`/${restaurantId}/menu/upload-image`, formData)
             .then((response) => response.data)
             .catch((error) => {
                 console.log(error);
             }); // La respuesta debe incluir la URL de la imagen
-        console.log("response:", response);
+
         return response.url;
     };
 
     const onSubmit = async (data: Partial<Dish>) => {
-        // Aquí iría la lógica para guardar o actualizar el plato
-        console.log(data);
         setSavingChanges(true);
         let imageUrl = "";
         if (photoFile) {
-            console.log("photoFile:", photoFile);
             imageUrl = await uploadImageToS3(photoFile);
-            console.log("Image uploaded to S3 with URL:", imageUrl);
+        }
+        const updatedData = getValues();
+        if (isNew && !dish) {
+            const newDish = await restaurantAPI
+                .post(`/${restaurantId}/menu`, {
+                    ...updatedData,
+                    image: imageUrl,
+                    categoryId: categoryId!,
+                })
+                .then((response) => response.data);
+            setData((prevData: any[]) =>
+                prevData.map((category) =>
+                    category.categoryId === categoryId
+                        ? { ...category, dishes: [...category.dishes, newDish] }
+                        : category
+                )
+            );
+            console.log(data);
+        } else {
+            const { id, isAvailable, ...dataToUpdate } = updatedData;
+            const updatedDish = await restaurantAPI
+                .patch(`/menu/${dish?.id}`, {
+                    ...dataToUpdate,
+                    dishId: dish?.id,
+                    ...(imageUrl !== "" && { image: imageUrl }),
+                })
+                .then((response) => response.data);
+            setData((prevData: any[]) =>
+                prevData.map((category) =>
+                    category.categoryId === categoryId
+                        ? {
+                              ...category,
+                              dishes: category.dishes.map((d: any) => (d.id === dish?.id ? updatedDish : d)),
+                          }
+                        : category
+                )
+            );
         }
 
-        const updatedData = getValues();
-        console.log("updatedData:", { ...updatedData });
-
-        const dish = await useCreateDish(restaurantId, {
-            ...updatedData,
-            image: imageUrl,
-            categoryId: categoryId!,
-        });
-        console.log("dish:", dish);
-        setData((prevData: Dish[]): Dish[] => [...prevData, dish]);
         setSavingChanges(false);
-
+        reset(initialValues);
         onClose();
     };
 
@@ -152,7 +166,7 @@ export const DishDialog = ({ open, onClose, dish, isNew, categoryId, setData }: 
                                     onChange={handleImageChange}
                                     label="Imagen"
                                     fullWidth
-                                    required
+                                    required={isNew}
                                 />
                             )}
                         />

@@ -43,7 +43,8 @@ export const RegisterCustomerForm = () => {
             console.log("errors:", errors);
             return;
         }
-        const userData = isGoogleUser ? { ...data, photoURL } : data;
+        const { image, ...rest } = data;
+        const userData = isGoogleUser ? { ...rest, image: photoURL } : { ...rest, image };
         const formData = await useRegisterFormData({ data: userData, role: RolesList.CUSTOMER });
 
         const error = await dispatch(startCreatingNativeCustomerUser(formData));
