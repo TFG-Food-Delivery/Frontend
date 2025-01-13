@@ -38,8 +38,6 @@ export const DishDialog = ({
     const { restaurantId: cartRestaurantId, items } = useSelector((state: any) => state.cart);
 
     const handleAddToCart = (dish: Dish) => {
-        console.log(cartRestaurantId);
-        console.log(dish);
         if (cartRestaurantId != null) {
             if (dish.restaurantId !== cartRestaurantId) {
                 setOpenDifferentRestDialog(true);
@@ -66,6 +64,9 @@ export const DishDialog = ({
     };
 
     if (!selectedDish) return null;
+
+    const cartItem = items.find((item: any) => item.dishId === selectedDish.id);
+    const itemQuantity = cartItem?.quantity ?? 0;
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -105,7 +106,7 @@ export const DishDialog = ({
             </DialogContent>
             <DialogActions sx={{ justifyContent: "flex-end", py: 2, px: 3 }}>
                 <Button onClick={onClose}>Cancelar</Button>
-                {!items.find((item: any) => item.dishId === selectedDish.id) ? (
+                {!cartItem ? (
                     <Button
                         onClick={() => handleAddToCart(selectedDish)}
                         variant="contained"
@@ -124,15 +125,9 @@ export const DishDialog = ({
                         }}
                     >
                         <IconButton onClick={() => handleRemoveFromCart(selectedDish)}>
-                            {items.find((item: any) => item.dishId === selectedDish.id)?.quantity === 1 ? (
-                                <Delete color="error" />
-                            ) : (
-                                <Remove color="primary" />
-                            )}
+                            {itemQuantity === 1 ? <Delete color="error" /> : <Remove color="primary" />}
                         </IconButton>
-                        <Typography variant="h6">
-                            {items.find((item: any) => item.dishId === selectedDish.id)?.quantity ?? 0}
-                        </Typography>
+                        <Typography variant="h6">{itemQuantity}</Typography>
                         <IconButton onClick={() => handleAddToCart(selectedDish)}>
                             <Add color="primary" />
                         </IconButton>

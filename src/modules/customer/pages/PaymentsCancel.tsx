@@ -43,7 +43,7 @@ export const PaymentsCancelPage = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                height: "100vh",
+                height: "40vh",
                 textAlign: "center",
             }}
         >
