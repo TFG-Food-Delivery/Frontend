@@ -3,12 +3,14 @@ import { Box, Paper, Typography } from "@mui/material";
 import { DeliveryDining, HourglassTop, ThumbUpOffAlt } from "@mui/icons-material";
 import { SearchToggle } from "./SearchToggle";
 import { Restaurant } from "../../restaurant/types";
+import { Dish } from "../types";
 
 type Props = {
     restaurantData: Restaurant;
+    handleOpenDialog: (dish: Dish) => void;
 };
 
-export const RestaurantInfo = ({ restaurantData }: Props) => {
+export const RestaurantInfo = ({ restaurantData, handleOpenDialog }: Props) => {
     return (
         <Paper
             elevation={5}

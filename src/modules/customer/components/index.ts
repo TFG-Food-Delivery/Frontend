@@ -1,7 +1,5 @@
 export * from "./Carousel";
 export * from "./FeaturedRestaurants";
-export * from "./FeaturedDishes";
-export * from "./FeaturedDish";
 export * from "./RestaurantInfo";
 export * from "./QuantitySelector";
 export * from "./CancelOrderDialog";
@@ -10,3 +8,5 @@ export * from "./SearchToggle";
 export * from "./RestaurantDishes";
 export * from "./RestaurantSearchResults";
 export * from "./DishItem";
+export * from "./RestaurantDishCard";
+export * from "./DishDialog";

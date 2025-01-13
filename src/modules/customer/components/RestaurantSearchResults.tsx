@@ -3,13 +3,15 @@ import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router";
 import { DishItem } from "./DishItem";
 import { useSearchRestaurantDishes } from "../hooks";
+import { Dish } from "../types";
 
 type Props = {
     searching: boolean;
     setSearching: (searching: boolean) => void;
+    handleOpenDialog: (dish: Dish) => void;
 };
 
-export const RestaurantSearchResults = ({ searching, setSearching }: Props) => {
+export const RestaurantSearchResults = ({ searching, setSearching, handleOpenDialog }: Props) => {
     const location = useLocation();
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -43,7 +45,7 @@ export const RestaurantSearchResults = ({ searching, setSearching }: Props) => {
 
                     {results.map((dish) => (
                         <Grid size={{ xs: 12, sm: 8, md: 6 }} key={dish.id}>
-                            <DishItem dish={dish}></DishItem>
+                            <DishItem dish={dish} handleOpenDialog={handleOpenDialog}></DishItem>
                         </Grid>
                     ))}
                 </>

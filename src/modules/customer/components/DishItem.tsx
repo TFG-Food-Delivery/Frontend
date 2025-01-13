@@ -1,17 +1,12 @@
-import { ArrowRightAlt } from "@mui/icons-material";
-import { Box, Button, Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
+import { Dish } from "../types";
 
 type Props = {
-    dish: {
-        id: string;
-        name: string;
-        description: string;
-        price: number;
-        image: string;
-    };
+    dish: Dish;
+    handleOpenDialog: (dish: Dish) => void;
 };
 
-export const DishItem = ({ dish }: Props) => {
+export const DishItem = ({ dish, handleOpenDialog }: Props) => {
     return (
         <Paper
             key={dish.id}
@@ -22,6 +17,7 @@ export const DishItem = ({ dish }: Props) => {
                 alignItems: "center",
                 cursor: "pointer",
             }}
+            onClick={() => handleOpenDialog(dish)}
         >
             <Box
                 sx={{
@@ -43,7 +39,7 @@ export const DishItem = ({ dish }: Props) => {
             </Box>
             <Box
                 component="img"
-                src={dish.image}
+                src={dish.image as string}
                 alt={dish.name}
                 sx={{
                     width: { xs: "10rem", md: "10rem" },

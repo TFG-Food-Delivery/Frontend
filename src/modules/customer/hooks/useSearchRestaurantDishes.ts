@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import { restaurantAPI } from "../../api";
-
-interface Dish {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    image: string;
-}
+import { Dish } from "../types";
 
 type Props = {
     restaurantId: string | undefined;
@@ -34,9 +27,12 @@ export function useSearchRestaurantDishes({ restaurantId, searchTerm }: Props) {
                 if (!(response.status === 200)) {
                     throw new Error("Network response was not ok");
                 }
-                const { data } = await response.data;
+                const { data } = response.data;
+                const allDishes = data.reduce((acc: Dish[], category: any) => {
+                    return [...acc, ...category.dishes];
+                }, []);
                 if (!isCancelled) {
-                    setResults(data); // assume data is an array of Restaurant
+                    setResults(allDishes); // assume data is an array of Restaurant
                 }
             } catch (err: any) {
                 if (!isCancelled) {

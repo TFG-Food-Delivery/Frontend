@@ -9,11 +9,10 @@ import {
     CircularProgress,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import { Dish } from "../../customer/types";
 import { ChangeEvent, useEffect, useState } from "react";
 import { restaurantAPI } from "../../api";
 import { useSelector } from "react-redux";
-import { useCreateDish } from "../hooks";
+import { Dish } from "../../customer/types";
 
 interface DishDialogProps {
     open: boolean;
