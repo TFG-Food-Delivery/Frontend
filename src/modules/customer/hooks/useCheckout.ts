@@ -1,6 +1,11 @@
 import { orderAPI, restaurantAPI } from "../../api";
 
-export const useCheckout = async (userId: string, restaurantId: string, items: Array<any>) => {
+export const useCheckout = async (
+    userId: string,
+    restaurantId: string,
+    items: Array<any>,
+    useLoyaltyPoints: boolean
+) => {
     const checkoutCart = async () => {
         try {
             const { data: restaurantData } = await restaurantAPI.get(`/${restaurantId}`);
@@ -15,6 +20,8 @@ export const useCheckout = async (userId: string, restaurantId: string, items: A
                     quantity: item.quantity,
                     price: item.price,
                 })),
+                deliveryFee: 2.99,
+                useLoyaltyPoints,
             });
             const { orderId } = response.data;
 

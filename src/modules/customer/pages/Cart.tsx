@@ -1,15 +1,19 @@
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Container, Stack, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import QuantitySelector from "../components/QuantitySelector";
 import { AppDispatch } from "../../store";
 import { fetchCart } from "../../store/cart";
 import { CartViewItem } from "../types";
 import { useCheckout } from "../hooks";
 import { useNavigate } from "react-router";
+import { useGetCustomer } from "../../common/hooks";
 
 export const CartPage = () => {
     const { uid: userId } = useSelector((state: any) => state.auth);
+    const [loyaltyPoints, setLoyaltyPoints] = useState(0);
+    const [deliveryFee, setDeliveryFee] = useState(2.99);
+    const [useLoyaltyPoints, setUseLoyaltyPoints] = useState(false);
     const { restaurantId, items: cartItems } = useSelector((state: any) => state.cart); // Estado del carrito desde Redux
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -18,10 +22,32 @@ export const CartPage = () => {
         if (cartItems.length > 0) {
             dispatch(fetchCart(userId));
         }
-    }, []);
+
+        const getCustomer = async () => {
+            try {
+                const res = await useGetCustomer(userId);
+                if (res) {
+                    setLoyaltyPoints(res.loyaltyPoints);
+                }
+            } catch (error) {
+                console.error("Error fetching customer data:", error);
+            }
+        };
+
+        getCustomer();
+    }, [userId]);
+
+    const handleLoyaltyPointsToggle = () => {
+        setUseLoyaltyPoints((prev) => !prev);
+        if (!useLoyaltyPoints) {
+            setLoyaltyPoints((prev) => prev - deliveryFee * 100);
+        } else {
+            setLoyaltyPoints((prev) => prev + deliveryFee * 100);
+        }
+    };
 
     async function handleCheckout(event: React.MouseEvent<HTMLButtonElement>): Promise<void> {
-        const orderId = await useCheckout(userId, restaurantId, cartItems);
+        const orderId = await useCheckout(userId, restaurantId, cartItems, useLoyaltyPoints);
 
         navigate(`/customer/order/payment/${orderId}`);
     }
@@ -108,7 +134,60 @@ export const CartPage = () => {
                                     </Box>
                                 </Box>
                             ))}
-                            <Box sx={{ mt: "2rem", textAlign: "right" }}>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "1rem",
+                                    justifyContent: { xs: "center", md: "flex-end" },
+                                    alignItems: { xs: "center", md: "flex-end" },
+                                }}
+                            >
+                                <Typography variant="body1" fontWeight={"bold"} sx={{ color: "info.dark" }}>
+                                    Loyalty Points: {loyaltyPoints}
+                                </Typography>
+                                <Typography variant="body1" fontWeight={"bold"} sx={{ color: "info.dark" }}>
+                                    Delivery Fees:
+                                    <Typography
+                                        variant="body1"
+                                        component={"span"}
+                                        fontWeight={"bold"}
+                                        sx={{
+                                            color: useLoyaltyPoints ? "text.disabled" : "info.dark",
+                                            textDecoration: useLoyaltyPoints ? "line-through" : "none",
+                                            ml: "0.5rem",
+                                        }}
+                                    >
+                                        {deliveryFee}€
+                                    </Typography>
+                                </Typography>
+                            </Box>
+                            <Box
+                                sx={{
+                                    mt: "2rem",
+                                    textAlign: "right",
+                                    display: "flex",
+                                    flexDirection: { xs: "column", md: "row" },
+                                    justifyContent: { xs: "center", md: "flex-end" },
+                                    alignItems: { xs: "center", md: "flex-end" },
+                                    gap: { xs: "1rem", md: "2rem" },
+                                }}
+                            >
+                                {loyaltyPoints >= deliveryFee * 100 && (
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "flex-end",
+                                            alignItems: "center",
+                                            gap: "0.5rem",
+                                        }}
+                                    >
+                                        <Checkbox checked={useLoyaltyPoints} onChange={handleLoyaltyPointsToggle} />
+                                        <Typography variant="body2" component="span">
+                                            Use Loyalty Points to cover delivery fee
+                                        </Typography>
+                                    </Box>
+                                )}
                                 <Button variant="contained" color="primary" onClick={handleCheckout}>
                                     <Typography variant="body1" fontWeight={"bold"}>
                                         Checkout

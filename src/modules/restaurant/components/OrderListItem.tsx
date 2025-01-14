@@ -41,7 +41,7 @@ export const OrderListItem = ({ order, setSelectedOrder }: Props) => {
                 }}
             >
                 <Typography variant="body1" fontWeight={"bold"}>
-                    Total: ${order.totalAmount}
+                    Total: {order.totalAmount}€
                 </Typography>
                 <Button variant="contained" color="primary" onClick={() => handleOpenDialog(order)}>
                     See Details
