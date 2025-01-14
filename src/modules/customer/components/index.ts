@@ -10,3 +10,4 @@ export * from "./RestaurantSearchResults";
 export * from "./DishItem";
 export * from "./RestaurantDishCard";
 export * from "./DishDialog";
+export * from "./FilterDialog";

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Box, Button, CircularProgress, Container, Paper, Stack, Typography } from "@mui/material";
-import { ArrowRightAlt } from "@mui/icons-material";
+import { ArrowRightAlt, FilterAlt } from "@mui/icons-material";
 import { useSearchRestaurants } from "../hooks";
+import { FilterDialog } from "../components";
+import { CuisineType } from "../../common/types";
 
 export const SearchResultsPage = () => {
     const location = useLocation();
@@ -12,6 +14,8 @@ export const SearchResultsPage = () => {
     const initialQuery = params.get("q") || "";
 
     const [searchTerm, setSearchTerm] = useState(initialQuery);
+    const [openFilterDialog, setOpenFilterDialog] = useState(false);
+    const [selectedCuisineTypes, setSelectedCuisineTypes] = useState<CuisineType[]>([]);
 
     const { results, loading, error } = useSearchRestaurants({ searchTerm });
     useEffect(() => {
@@ -20,11 +24,34 @@ export const SearchResultsPage = () => {
         setSearchTerm(newQuery);
     }, [location.search]);
 
+    const filteredResults = results.filter(
+        (restaurant) =>
+            selectedCuisineTypes.length === 0 ||
+            selectedCuisineTypes.map((type) => type.replace(/\s+/g, "")).includes(restaurant.cuisineType)
+    );
+
+    const handleOpenFilterDialog = () => {
+        setOpenFilterDialog(true);
+    };
+
+    const handleCloseFilterDialog = () => {
+        setOpenFilterDialog(false);
+    };
+
     return (
         <Container maxWidth="xl">
             <Typography variant="h4" component={"h1"} fontWeight={"bold"} sx={{ mb: "3rem" }}>
                 Results
             </Typography>
+
+            <Button
+                variant="contained"
+                sx={{ mb: "2rem", bgcolor: "white", color: "info.main" }}
+                onClick={handleOpenFilterDialog}
+                endIcon={<FilterAlt />}
+            >
+                Filter
+            </Button>
 
             {/* Loading / Error state */}
             {loading && (
@@ -35,7 +62,7 @@ export const SearchResultsPage = () => {
             {error && <p style={{ color: "red" }}>{error}</p>}
 
             {/* Results List */}
-            {results.length > 0 ? (
+            {filteredResults.length > 0 ? (
                 <Stack spacing={2}>
                     {results.map((restaurant) => (
                         <Paper
@@ -89,6 +116,12 @@ export const SearchResultsPage = () => {
                     </Typography>
                 )
             )}
+
+            <FilterDialog
+                open={openFilterDialog}
+                onClose={handleCloseFilterDialog}
+                setSelectedCuisineTypes={setSelectedCuisineTypes}
+            />
         </Container>
     );
 };

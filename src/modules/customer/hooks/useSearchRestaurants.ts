@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { restaurantAPI } from "../../api";
+import { CuisineType } from "../../common/types";
 
 interface Restaurant {
     id: number;
     name: string;
-    cuisineType: string;
+    cuisineType: CuisineType;
     image: string;
 }
 

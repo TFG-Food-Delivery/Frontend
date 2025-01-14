@@ -1,3 +1,5 @@
+import { Allergens } from "../../restaurant/enum/Allergens.enum";
+
 export type Dish = {
     id: string;
     name: string;
@@ -7,4 +9,5 @@ export type Dish = {
     isAvailable?: boolean;
     restaurantId: string;
     categoryId: string;
+    allergens: Allergens[];
 };

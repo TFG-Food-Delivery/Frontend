@@ -1,4 +1,4 @@
-import { Add, AddShoppingCart, Close, Delete, Remove } from "@mui/icons-material";
+import { Add, AddShoppingCart, Close, Delete, Remove, WarningAmber } from "@mui/icons-material";
 import {
     Dialog,
     DialogTitle,
@@ -100,6 +100,19 @@ export const DishDialog = ({
                 <Typography variant="body1" sx={{ mb: 2 }}>
                     {selectedDish.description}
                 </Typography>
+                {selectedDish.allergens.length > 0 && (
+                    <Box display="flex" alignItems="center" gap={1} mb={2}>
+                        <Box component={"span"}>
+                            <WarningAmber color="warning" />
+                        </Box>
+                        <Typography variant="body1" color="warning">
+                            This dish contains the following allergens:
+                            <Typography variant="body1" component="span" color="warning" fontWeight="bold" ml={1}>
+                                {selectedDish.allergens.map((allergen) => allergen).join(", ")}
+                            </Typography>
+                        </Typography>
+                    </Box>
+                )}
                 <Typography variant="h6" color="primary">
                     {selectedDish.price?.toFixed(2) ?? 0}€
                 </Typography>

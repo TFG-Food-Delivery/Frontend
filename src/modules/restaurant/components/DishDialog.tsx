@@ -7,12 +7,16 @@ import {
     TextField,
     Box,
     CircularProgress,
+    Typography,
+    Chip,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { ChangeEvent, useEffect, useState } from "react";
 import { restaurantAPI } from "../../api";
 import { useSelector } from "react-redux";
 import { Dish } from "../../customer/types";
+import { Allergens } from "../enum/Allergens.enum";
+import { Done } from "@mui/icons-material";
 
 interface DishDialogProps {
     open: boolean;
@@ -26,12 +30,14 @@ interface DishDialogProps {
 export const DishDialog = ({ open, onClose, dish, isNew, categoryId, setData }: DishDialogProps) => {
     const { uid: restaurantId } = useSelector((state: any) => state.auth);
     const [photoFile, setPhotoFile] = useState<File | null>(null);
+    const [selectedAllergens, setSelectedAllergens] = useState<Allergens[]>([]);
+    const [selectedAllergensError, setSelectedAllergensError] = useState<string | null>(null);
     const [savingChanges, setSavingChanges] = useState(false);
     const initialValues = {
         name: "",
         description: "",
-        price: null,
-        image: null as File | null,
+        price: 0,
+        image: undefined,
         categoryId,
     };
     const { control, handleSubmit, reset, setValue, getValues } = useForm<Dish>({
@@ -41,6 +47,7 @@ export const DishDialog = ({ open, onClose, dish, isNew, categoryId, setData }: 
     useEffect(() => {
         if (dish) {
             reset(dish);
+            setSelectedAllergens(dish.allergens);
         } else {
             reset(initialValues);
         }
@@ -82,6 +89,7 @@ export const DishDialog = ({ open, onClose, dish, isNew, categoryId, setData }: 
                     ...updatedData,
                     image: imageUrl,
                     categoryId: categoryId!,
+                    allergens: selectedAllergens,
                 })
                 .then((response) => response.data);
             setData((prevData: any[]) =>
@@ -93,12 +101,13 @@ export const DishDialog = ({ open, onClose, dish, isNew, categoryId, setData }: 
             );
             console.log(data);
         } else {
-            const { id, isAvailable, ...dataToUpdate } = updatedData;
+            const { id, isAvailable, restaurantId, ...dataToUpdate } = updatedData;
             const updatedDish = await restaurantAPI
                 .patch(`/menu/${dish?.id}`, {
                     ...dataToUpdate,
                     dishId: dish?.id,
                     ...(imageUrl !== "" && { image: imageUrl }),
+                    allergens: selectedAllergens,
                 })
                 .then((response) => response.data);
             setData((prevData: any[]) =>
@@ -114,6 +123,20 @@ export const DishDialog = ({ open, onClose, dish, isNew, categoryId, setData }: 
         }
 
         setSavingChanges(false);
+        reset(initialValues);
+        onClose();
+    };
+
+    function handleClickAllergen(allergen: Allergens): void {
+        if (selectedAllergens.includes(allergen)) {
+            setSelectedAllergens((prevAllergens) => prevAllergens.filter((a) => a !== allergen));
+        } else {
+            setSelectedAllergens((prevAllergens) => [...prevAllergens, allergen]);
+        }
+    }
+
+    const handleClose = () => {
+        setSelectedAllergens([]);
         reset(initialValues);
         onClose();
     };
@@ -169,10 +192,35 @@ export const DishDialog = ({ open, onClose, dish, isNew, categoryId, setData }: 
                                 />
                             )}
                         />
+                        <Box marginY={"1rem"}>
+                            <Typography variant="h6">Allergens</Typography>
+                            {Object.values(Allergens).map((allergen) => (
+                                <Chip
+                                    key={allergen}
+                                    label={allergen}
+                                    color={selectedAllergens.includes(allergen) ? "success" : "default"} // Cambia el color si está seleccionado
+                                    variant={selectedAllergens.includes(allergen) ? "filled" : "outlined"} // Cambia el variante si está seleccionado
+                                    onClick={() => handleClickAllergen(allergen)}
+                                    icon={selectedAllergens.includes(allergen) ? <Done /> : undefined}
+                                    sx={{
+                                        margin: "0.5rem 2rem 0 0",
+                                        padding: "0.5rem",
+                                        color: selectedAllergens.includes(allergen) ? "info.main" : "default",
+                                        fontWeight: selectedAllergens.includes(allergen) ? "bold" : "normal",
+                                    }}
+                                    size={"medium"}
+                                />
+                            ))}
+                            {selectedAllergensError && (
+                                <Typography color="error" sx={{ mt: 2 }}>
+                                    {selectedAllergensError}
+                                </Typography>
+                            )}
+                        </Box>
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={onClose}>Cancelar</Button>
+                    <Button onClick={handleClose}>Cancelar</Button>
                     <Button type="submit" variant="contained" color="primary">
                         {savingChanges ? (
                             <CircularProgress size={20} sx={{ color: "white" }} />
