@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Navigate, Route, Routes } from "react-router";
 import { authStatus, RolesList } from "../../store/auth";
-import { RestaurantDashboardPage, PendingOrdersPage, CompletedOrdersPage, MenuPage } from "../pages";
+import { RestaurantDashboardPage, PendingOrdersPage, CompletedOrdersPage, MenuPage, RevenuePage } from "../pages";
 
 export const RestaurantRoutes = () => {
     const { status, role } = useSelector((state: any) => state.auth);
@@ -12,7 +12,7 @@ export const RestaurantRoutes = () => {
                 <Route path="/dashboard" element={<RestaurantDashboardPage />} />
                 <Route path="/orders/pending" element={<PendingOrdersPage />} />
                 <Route path="/orders/completed" element={<CompletedOrdersPage />} />
-                <Route path="/revenue" element={<RestaurantDashboardPage />} />
+                <Route path="/revenue" element={<RevenuePage />} />
                 <Route path="/customer-feedback" element={<RestaurantDashboardPage />} />
                 <Route path="/menu" element={<MenuPage />} />
             </Routes>

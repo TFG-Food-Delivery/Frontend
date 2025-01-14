@@ -11,6 +11,10 @@ import CancelOrderDialog from "../components/CancelOrderDialog";
 import { Order } from "../../common/types";
 import { Restaurant } from "../../restaurant/types";
 import { GoogleMapReact } from "../../common/components";
+import { useSetCart } from "../hooks";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
+import { fetchCart } from "../../store/cart";
 
 const statuses = [
     OrderStatus.PENDING,
@@ -30,7 +34,7 @@ export const OrderStatusPage = () => {
         return urlParams.get(param);
     };
     const orderId = getQueryParam("orderId");
-
+    const dispatch = useDispatch<AppDispatch>();
     const [loading, setLoading] = useState(true);
     const [orderData, setOrderData] = useState<Order>();
     const [restaurantData, setRestaurantData] = useState<Restaurant>();
@@ -106,6 +110,14 @@ export const OrderStatusPage = () => {
             socket.disconnect();
         };
     }, [orderId]);
+
+    const handleReorder = async () => {
+        if (orderData && customerData) {
+            await useSetCart(orderData.items, customerData.id);
+            await dispatch(fetchCart(customerData.id));
+            navigate(`/cart`);
+        }
+    };
 
     return (
         <Container maxWidth={"xl"} sx={{ padding: { xs: "0 1rem", xl: "2rem 0rem" } }}>
@@ -206,6 +218,23 @@ export const OrderStatusPage = () => {
                                 onClick={() => setOpenCancelDialog(true)}
                             >
                                 Cancel Order
+                            </Button>
+                        )}
+                        {failedOrCanceledOrDelivered.includes(orderData.status) && (
+                            <Button
+                                variant={"outlined"}
+                                sx={{
+                                    position: { xs: "static", sm: "absolute" },
+                                    display: { xs: "block", sm: "inline-flex" },
+                                    right: { sm: "2%" },
+                                    bottom: { sm: 0 },
+                                    width: { xs: "100%", sm: "auto" },
+                                    mt: { xs: 2, sm: 0 },
+                                }}
+                                color={"primary"}
+                                onClick={handleReorder}
+                            >
+                                Reorder
                             </Button>
                         )}
                     </Box>

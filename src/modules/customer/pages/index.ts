@@ -7,3 +7,4 @@ export * from "./OrderStatusPage";
 export * from "./PaymentsCancel";
 export * from "./Orders";
 export * from "./SearchResults";
+export * from "./Insights";

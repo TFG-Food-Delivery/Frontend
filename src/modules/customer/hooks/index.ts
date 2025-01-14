@@ -6,3 +6,4 @@ export * from "./useCancelOrder";
 export * from "./useSearchRestaurants";
 export * from "./useSearchRestaurantDishes";
 export * from "./useUpdateCustomerProfile";
+export * from "./useSetCart";

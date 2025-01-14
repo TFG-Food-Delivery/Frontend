@@ -3,6 +3,7 @@ import { ExceptionsRouter } from "../../exceptions/router/ExceptionsRouter";
 import {
     CartPage,
     FeedPage,
+    InsightsPage,
     OrdersPage,
     OrderStatusPage,
     PaymentsCancelPage,
@@ -26,6 +27,7 @@ export const CustomerRouter = () => {
             <Route path="/payments/success" element={<OrderStatusPage />} />
             <Route path="/payments/cancel" element={<PaymentsCancelPage />} />
             <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/insights" element={<InsightsPage />} />
 
             <Route path="/search" element={<SearchResultsPage />} />
 

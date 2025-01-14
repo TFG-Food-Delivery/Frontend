@@ -10,7 +10,7 @@ export const useCheckout = async (userId: string, restaurantId: string, items: A
                 restaurantId: restaurantId,
                 restaurantName: restaurantData.name,
                 items: items.map((item: any) => ({
-                    dishId: item.id,
+                    dishId: item.dishId,
                     name: item.name,
                     quantity: item.quantity,
                     price: item.price,
